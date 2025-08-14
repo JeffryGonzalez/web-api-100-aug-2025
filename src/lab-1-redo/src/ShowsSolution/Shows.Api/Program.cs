@@ -20,6 +20,7 @@ builder.Services.AddMarten(config =>
 
 var app = builder.Build();
 
+builder.Services.AddSingleton<TimeProvider>(_ => TimeProvider.System);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
