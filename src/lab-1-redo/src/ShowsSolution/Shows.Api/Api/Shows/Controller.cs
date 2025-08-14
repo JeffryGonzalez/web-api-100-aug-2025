@@ -30,10 +30,21 @@ public class Controller : ControllerBase
         await _documentSession.SaveChangesAsync();
         return Ok(show);
     }
-    /*[HttpGet("{id}")]
+    [HttpGet("{id}")]
     public async Task<ActionResult> GetShow(Guid id)
     {
-    }*/
+        var getShow = await _documentSession.LoadAsync<Show>(id);
+        return Ok(getShow);
+    }
+    [HttpGet]
+    public async Task<IEnumerable<Show>> GetAllShows()
+    {
+        var shows = await _documentSession.Query<Show>()
+                                  .OrderByDescending(s => s.CreatedAt)
+                                  .ToListAsync();
+
+        return shows;
+    }
 }
 public class ShowRequest
 {
@@ -47,5 +58,5 @@ public class Show
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string StreamingService { get; set; } = string.Empty;
-    public DateTimeOffset CreatedAt { get; init; } = DateTime.UtcNow;
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 }

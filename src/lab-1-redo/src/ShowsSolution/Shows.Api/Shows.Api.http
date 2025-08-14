@@ -12,3 +12,6 @@ Content-Type: application/json
     "description":"David Lynch at his best",
     "streamingService":"Amazon Prime"
 }
+###
+GET http://localhost:1338/api/shows/{d6482dde-6158-437a-849e-2d11d30732d8}
+Accept: application/json
