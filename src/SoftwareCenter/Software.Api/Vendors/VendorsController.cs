@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
+using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Software.Api.Vendors.Services;
 
 namespace Software.Api.Vendors;
 
@@ -59,7 +61,32 @@ public class VendorsController : ControllerBase
         };
     }
 
+    [HttpPost("/vendors/{vendorId:guid}/contact")]
+    public async Task<ActionResult> UpdateContactAsync([FromRoute] Guid vendorId, [FromBody] PointOfContact request,
+        [FromServices] IValidator<PointOfContact> validator,
+        [FromServices] IHttpContextAccessor context,
+        [FromServices] IUpdateContact updateContact,
+        [FromServices] IDocumentSession session,
+        CancellationToken token)
+    {
+        if (!validator.Validate(request).IsValid)
+            return BadRequest();
 
+        var vendor = await session.Query<VendorEntity>().Where(v => v.Id == vendorId).SingleOrDefaultAsync(token);
+        if (vendor is not null)
+        {
+            if (context.HttpContext?.User?.Identity?.Name == vendor.CreatedBy ||
+                (context.HttpContext?.User?.IsInRole("CEO") ?? false))
+            {
+                var updatedContact = await updateContact.UpdateContactAsync(vendor, request);
+                return Ok(updatedContact);
+            }
+            else
+                return Unauthorized();
+        }
+        else
+            return NotFound();
+    }
 }
 
 

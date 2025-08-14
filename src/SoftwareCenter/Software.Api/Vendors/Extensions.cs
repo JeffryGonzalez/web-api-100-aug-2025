@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Software.Api.Vendors.Services;
 
 namespace Software.Api.Vendors;
 
@@ -9,6 +10,8 @@ public static class Extensions
         services.AddScoped<ICreateVendors, MartenVendorData>();
         services.AddScoped<ILookupVendors, MartenVendorData>();
         services.AddScoped<IValidator<VendorCreateModel>, VendorCreateModelValidator>();
+        services.AddScoped<IUpdateContact, MartenVendorData>();
+        services.AddScoped<IValidator<PointOfContact>, PointOfContactValidator>();
 
         return services;
     }
