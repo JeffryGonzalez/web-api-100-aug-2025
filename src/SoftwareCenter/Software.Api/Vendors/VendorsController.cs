@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,7 +60,30 @@ public class VendorsController : ControllerBase
         };
     }
 
+    [Authorize(Policy = "SoftwareCenterManager")]
+    [HttpPost("/vendors/{id:guid}/contact")] // POST to a update point of contact resource. 
+    public async Task<ActionResult<VendorDetailsModel>> UpdateAVendorContactAsync(
+        [FromRoute] Guid id,
+        [FromBody] PointOfContact request,
+        [FromServices] IUpdateVendors vendorContactUpdate,
+        [FromServices] IValidator<PointOfContact> validator,
+        CancellationToken token
+    )
+    {
+        var user = User;
+        var validations = await validator.ValidateAsync(request);
 
+        if (!validations.IsValid)
+        {
+            //return BadRequest(); // just send a 400
+            return BadRequest(validations.Errors); // send a 400 with some error information in it.
+            // we also have problems+json - I'll come back to that
+        }
+
+        VendorDetailsModel? response = await vendorContactUpdate.UpdateVendorContadctByIdAsync(id, request, token);
+
+        return Created($"/vendors/{response.Id}", response);
+    }
 }
 
 
