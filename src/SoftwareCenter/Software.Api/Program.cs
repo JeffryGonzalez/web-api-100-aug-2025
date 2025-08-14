@@ -13,19 +13,21 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddAuthorizationBuilder().AddPolicy("SoftwareCenterManager", pol =>
-{
-    pol.RequireRole("SoftwareCenter");
-    pol.RequireRole("Manager");
-}).AddPolicy("SoftwareCenter", pol =>
-{
-    pol.RequireRole("SoftwareCenter");
-});
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("SoftwareCenterManager", pol =>
+    {
+        pol.RequireRole("SoftwareCenter");
+        pol.RequireRole("Manager");
+    })
+    .AddPolicy("SoftwareCenter", pol =>
+    {
+        pol.RequireRole("SoftwareCenter");
+    });
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
+builder.Services.AddHttpContextAccessor();
 var connectionString = builder.Configuration.GetConnectionString("software") ?? throw new Exception("No Connection String Found In Environment");
 
 builder.Services.AddMarten(opts =>

@@ -23,3 +23,4 @@ npx gitpick -o JeffryGonzalez/web-api-100-aug-2025 instructor
 Some of this is inviting you to "code along" - do it as much as it's helpful.
 
 1. Close your Visual Studio
+2. Change
