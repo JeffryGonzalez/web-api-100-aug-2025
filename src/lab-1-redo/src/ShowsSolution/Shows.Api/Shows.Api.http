@@ -1,6 +1,14 @@
-@Shows.Api_HostAddress = http://localhost:5114
+@Shows.Api_HostAddress = http://localhost:1338
 
 GET {{Shows.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+POST http://localhost:1338/api/shows
+Content-Type: application/json
+
+{
+    "name":"Twin Peaks the Return of",
+    "description":"David Lynch at his best",
+    "streamingService":"Amazon Prime"
+}
