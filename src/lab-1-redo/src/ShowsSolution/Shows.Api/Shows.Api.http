@@ -1,6 +1,21 @@
-@Shows.Api_HostAddress = http://localhost:5114
+@Shows.Api_HostAddress = http://localhost:1338
 
-GET {{Shows.Api_HostAddress}}/weatherforecast/
-Accept: application/json
 
 ###
+
+POST http://localhost:1338/api/shows
+Content-Type: application/json
+
+{
+    "name":"Severence",
+    "description":"Weirdnessat his best",
+    "streamingService":"Apple TV"
+}
+
+
+###
+
+GET http://localhost:1338/api/shows
+
+###
+GET http://localhost:1338/api/status

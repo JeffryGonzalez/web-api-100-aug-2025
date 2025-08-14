@@ -1,4 +1,5 @@
 using Alba;
+using Shows.Api.Api.Shows;
 using Shows.Tests.Api.Fixtures;
 
 namespace Shows.Tests.Api.Shows;
@@ -22,8 +23,24 @@ public class AddingAShow(SystemTestFixture fixture)
             }).ToUrl("/api/shows");
             _.StatusCodeShouldBeOk();
         });
-        
+
+        var show = response.ReadAsJson<ShowResponse>();
+        var showId = show.Id; 
+
+        var getResponse = await _host.Scenario(_ =>
+        {
+            _.Get.Url($"/api/shows/{showId}");
+            _.StatusCodeShouldBeOk();
+        });
+
+        var retrievedShow = getResponse.ReadAsJson<ShowResponse>();
+        Assert.Equal("Test Show", retrievedShow.Name);
+        Assert.Equal("This is a test show", retrievedShow.Description);
+        Assert.Equal("HBO Max", retrievedShow.StreamingService);
+        Assert.Equal(showId, retrievedShow.Id);
 
     }
+
+
     
 }
