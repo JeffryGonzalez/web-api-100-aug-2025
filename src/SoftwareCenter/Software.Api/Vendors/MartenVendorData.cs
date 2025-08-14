@@ -1,19 +1,20 @@
 ﻿
 using Marten;
+using RTools_NTS.Util;
 using Software.Api.CatalogItems;
 using Software.Api.CatalogItems.Services;
 
 namespace Software.Api.Vendors;
 
-public class MartenVendorData(IDocumentSession session, HttpContext context ) : ICreateVendors, ILookupVendors, ICheckForVendors
+public class MartenVendorData(IDocumentSession session, IHttpContextAccessor context) : ICreateVendors, ILookupVendors, ICheckForVendors, IUpdateVendors
 {
     public async Task<VendorDetailsModel> CreateVendorAsync(VendorCreateModel request)
     {
         // create the thing to save in the database, save it(?) return a VendorDetailsModel
         // create insert statement, run it the database.
         /// Mapping - Getting from Point A -> Point B
-     
-        var name = context.User?.Identity?.Name ?? "";
+
+        var name = context.HttpContext?.User?.Identity?.Name ?? "";
         var vendorToSave = request.MapToEntity(Guid.NewGuid(), name);
 
         session.Store(vendorToSave);
@@ -35,7 +36,7 @@ public class MartenVendorData(IDocumentSession session, HttpContext context ) : 
             .ToListAsync();
 
         // Select -> Map
-       //var response = results.Select(r => new VendorSummaryItem { Id = r.Id, Name = r.Name, }).ToList();
+        //var response = results.Select(r => new VendorSummaryItem { Id = r.Id, Name = r.Name, }).ToList();
         return results;
     }
 
@@ -45,9 +46,32 @@ public class MartenVendorData(IDocumentSession session, HttpContext context ) : 
         if (entity == null)
         {
             return null;
-        } else
+        }
+        else
         {
-            return entity.MapToDetails(); 
+            return entity.MapToDetails();
+        }
+    }
+
+    public async Task<VendorDetailsModel> UpdateVendorContadctByIdAsync(Guid id, PointOfContact request, CancellationToken token)
+    {
+        var entity = await session.Query<VendorEntity>().Where(v => v.Id == id).SingleOrDefaultAsync(token);
+        if (entity == null)
+        {
+            return null;
+        }
+        else
+        {
+            // Create a new PointOfContact with the updated Name, preserving other properties
+            entity.Contact = new PointOfContact
+            {
+                Name = request.Name,
+                Email = request.Email,
+                Phone = request.Phone
+            };
+            session.Store(entity);
+            await session.SaveChangesAsync(token);
+            return entity.MapToDetails();
         }
     }
 }
